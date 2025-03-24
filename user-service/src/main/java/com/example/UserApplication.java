@@ -9,3 +9,4 @@ public class UserApplication {
         SpringApplication.run(UserApplication.class, args);
     }
 }
+
