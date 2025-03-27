@@ -26,7 +26,7 @@ public class User {
     @Column(name="middlename", length = 100, nullable = true)
     private String middlename;
 
-    @Column(name="suname", length = 100, nullable = false)
+    @Column(name="surname", length = 100, nullable = false)
     private String surname;
 
     @Column(name="email", length = 100, nullable = false, unique = true)
