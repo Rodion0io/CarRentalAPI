@@ -7,10 +7,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -39,7 +36,7 @@ public class JwtService {
                 .compact();
     }
 
-    public String generateAccessToken(String userId, String login){
+    public String generateRefreshToken(String userId, String login){
         return Jwts.builder()
                 .setSubject(userId)
                 .claim("login", login)
@@ -86,21 +83,26 @@ public class JwtService {
         }
     }
 
+    public String extractLogin(String token){
+        try{
+            return extractClaim(token, claims -> claims.get("login", String.class));
+        }
+        catch (Exception error){
+            log.error("Не валидный токен: {}", error.getMessage());
+//            Временно так ошибку создаем
+            throw new Error("Не валидный токен");
+        }
+    }
+
+
+
     private Date extractExpireDate(String token){
         Date expiration = extractClaim(token, Claims::getExpiration);
         return expiration;
     }
 
-    private boolean isTokenExpired(String token){
-        try {
-            return extractExpireDate(token).before(new Date ());
-        }
-        catch (Exception error){
-            log.error("Токен не валиден или истек {}", error.getMessage());
-            // Временно так ошибку создаем
-            throw new Error("Не валидный токен");
-        }
+    public boolean isTokenExpired(String token){
+        return extractExpireDate(token).before(new Date());
     }
-
 
 }
