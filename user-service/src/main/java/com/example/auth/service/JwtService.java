@@ -17,7 +17,6 @@ import java.util.function.Function;
 
 @Slf4j
 @Service
-@AllArgsConstructor
 public class JwtService {
     @Value("${jwt.accessSecret}")
     private String ACCESS_SECRET_KEY;

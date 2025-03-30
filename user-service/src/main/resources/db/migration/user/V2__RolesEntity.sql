@@ -1,4 +1,0 @@
-CREATE TABLE userRoles (
-    roleId VARCHAR(100) NOT NULL,
-    userId VARCHAR(100) NOT NULL
-);

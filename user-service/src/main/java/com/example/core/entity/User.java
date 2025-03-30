@@ -1,7 +1,8 @@
 package com.example.core.entity;
 
 import lombok.*;
-import javax.persistence.*;
+//import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import org.hibernate.annotations.UuidGenerator;
@@ -16,7 +17,7 @@ import org.hibernate.annotations.UuidGenerator;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue
     @UuidGenerator
     private UUID id;
 

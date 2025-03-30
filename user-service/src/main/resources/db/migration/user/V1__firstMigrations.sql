@@ -15,5 +15,11 @@ CREATE TABLE users (
 
 CREATE TABLE roles (
     id UUID PRIMARY KEY,
-    roleName VARCHAR(100) NOT NULL
+    role_name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE user_roles (
+    id UUID PRIMARY KEY,
+    role_id VARCHAR(100) NOT NULL,
+    user_id VARCHAR(100) NOT NULL
 );

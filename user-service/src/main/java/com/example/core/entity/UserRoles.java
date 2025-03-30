@@ -1,15 +1,27 @@
 package com.example.core.entity;
 
 
-import javax.persistence.Column;
-import javax.persistence.Table;
+import lombok.*;
+import jakarta.persistence.*;
 
-@Table(name = "user-roles")
+import java.util.UUID;
+
+@Entity
+@Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@RequiredArgsConstructor
+@Table(name = "user_roles")
 public class UserRoles {
 
-    @Column(name="roleId", length = 100, nullable = false)
-    private String roleId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
 
-    @Column(name="userId", length = 100, nullable = false)
-    private String userId;
+    @Column(name="role_id", length = 100, nullable = false)
+    private String role_id;
+
+    @Column(name="user_id", length = 100, nullable = false)
+    private String user_id;
 }
