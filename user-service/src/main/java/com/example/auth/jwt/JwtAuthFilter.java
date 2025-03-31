@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -25,63 +26,47 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        // Список публичных маршрутов
+        List<String> publicEndpoints = List.of(
+                "/auth/register",
+                "/auth/login",
+                "/api/user/registration"
+        );
 
-        // Пропускаем публичные пути
-        if (isPublicPath(request.getServletPath())) {
+        // Проверяем, не является ли текущий запрос публичным
+        String requestURI = request.getRequestURI();
+        if (publicEndpoints.contains(requestURI)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Получаем токен
+        // Дальше идет стандартная логика проверки JWT
         String token = getToken(request);
-        if (token == null) {
-            sendError(response, "Missing JWT token");
-            return;
-        }
+        String login = jwtService.extractLogin(token);
 
-        try {
-            String login = jwtService.extractLogin(token);
-            if (login != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(login);
-                if (jwtService.isTokenValid(token, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails,
-                                    null,
-                                    userDetails.getAuthorities());
-                    authToken.setDetails(
-                            new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
+        if (StringUtils.isNotEmpty(login) && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(login);
+            if (jwtService.isTokenValid(token, userDetails)) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
-            filterChain.doFilter(request, response);
-        } catch (Exception e) {
-            sendError(response, "Invalid JWT token: " + e.getMessage());
         }
+
+        filterChain.doFilter(request, response);
     }
 
-    private String getToken(HttpServletRequest request) {
+
+    private String getToken(HttpServletRequest request){
         String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+        String token = "";
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")){
+            token = bearerToken.substring(7);
         }
-        return null;
-    }
-
-    private boolean isPublicPath(String path) {
-        return path.startsWith("/auth/")
-                || path.startsWith("/swagger-ui")
-                || path.startsWith("/v3/api-docs")
-                || path.equals("/error");
-    }
-
-    private void sendError(HttpServletResponse response, String message) throws IOException {
-        response.setContentType("application/json");
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.getWriter().write("{\"error\": \"" + message + "\"}");
+        else{
+            token = "";
+        }
+        return token;
     }
 }

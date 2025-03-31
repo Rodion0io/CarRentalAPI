@@ -8,10 +8,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/user")
 public class UserController {
 
-    @PostMapping(ApiPaths.REGISTRATION)
+    @GetMapping("/registration")
     public String registration(){
+        System.out.println("🚀 Контроллер получил запрос!");
         return "hello";
     }
 
