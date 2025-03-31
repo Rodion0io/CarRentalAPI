@@ -1,5 +1,6 @@
-package com.example.auth.config;
+package com.example;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
@@ -17,14 +18,15 @@ public class SwaggerConfig {
                         .title("My API")
                         .version("1.0")
                         .description("API с JWT авторизацией"))
-                .addSecurityItem(new SecurityRequirement()
-                        .addList("Bearer Authentication"))
-                .components(new io.swagger.v3.oas.models.Components()
+                // Убираем глобальное требование авторизации
+                .components(new Components()
                         .addSecuritySchemes("Bearer Authentication",
                                 new SecurityScheme()
                                         .name("Bearer Authentication")
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
-                                        .bearerFormat("JWT")));
+                                        .bearerFormat("JWT")
+                        )
+                );
     }
 }

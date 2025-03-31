@@ -5,9 +5,11 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -15,93 +17,81 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 
-@Slf4j
 @Service
+@RequiredArgsConstructor
 public class JwtService {
+    @Autowired
+    private final UserDetailsService userDetailsService;
+
     @Value("${jwt.accessSecret}")
-    private String ACCESS_SECRET_KEY;
+    private String ACCESS_SECRETE;
 
     @Value("${jwt.refreshSecrete}")
-    private String REFRESH_SECRETE_KEY;
+    private String REFRESH_TOKEN;
 
-    public String generateAccessToken(String userId, List<String> listRoles, String login){
+    public String generateAccessToken(String userId, String login, List<String> roles) {
         return Jwts.builder()
                 .setSubject(userId)
+                .claim("roles", roles)
                 .claim("login", login)
-                .claim("roles", listRoles)
-                .setIssuedAt( new  Date (System.currentTimeMillis()))
-                .setExpiration( new  Date (System.currentTimeMillis() + 1000 * 60 * 24 )) //пока 1 день
-                .signWith(getAccessSignInKey(), SignatureAlgorithm.HS256)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24)) // 1 day
+                .signWith(getSignInKey(ACCESS_SECRETE), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String generateRefreshToken(String userId, String login){
+    public String generateRefreshToken(String userId, String login) {
         return Jwts.builder()
                 .setSubject(userId)
                 .claim("login", login)
-                .setIssuedAt( new  Date (System.currentTimeMillis()))
-                .setExpiration( new  Date (System.currentTimeMillis() + 1000 * 60 * 24 )) //пока 1 день
-                .signWith(getRefreshSignInKey(), SignatureAlgorithm.HS256)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24)) // 1 day
+                .signWith(getSignInKey(REFRESH_TOKEN), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    private Key getAccessSignInKey(){
-        Key result = Keys.hmacShaKeyFor(Decoders.BASE64.decode(ACCESS_SECRET_KEY));
-        return result;
-    }
-
-    private Key getRefreshSignInKey(){
-        Key result = Keys.hmacShaKeyFor(Decoders.BASE64.decode(REFRESH_SECRETE_KEY));
-        return result;
-    }
-
-    private Claims extractAllClaims(String token){
-        try{
-            return Jwts.parser().setSigningKey(getAccessSignInKey()).build().parseClaimsJws(token).getBody();
-        }
-        catch (Exception error){
-            log.error("Не валидный токен: {}", error.getMessage());
-//            Временно так ошибку создаем
-            throw new Error("Не валидный токен");
-        }
+    private Claims extractAllClaimsFromAccess(String token) {
+        return Jwts.parser().
+                setSigningKey(getSignInKey(ACCESS_SECRETE))
+                .build().parseClaimsJws(token)
+                .getBody();
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
-        final Claims claims = extractAllClaims(token);
+        final Claims claims = extractAllClaimsFromAccess(token);
         return claimsResolver.apply(claims);
     }
 
-    public List<String> extractRoles(String token){
-        try{
-            return extractClaim(token, claims -> claims.get("roles", List.class));
-        }
-        catch (Exception error){
-            log.error("Не валидный токен: {}", error.getMessage());
-//            Временно так ошибку создаем
-            throw new Error("Не валидный токен");
-        }
+    public String extractLogin(String token) {
+        return extractClaim(token, claims -> claims.get("login", String.class));
     }
 
-    public String extractLogin(String token){
-        try{
-            return extractClaim(token, claims -> claims.get("login", String.class));
-        }
-        catch (Exception error){
-            log.error("Не валидный токен: {}", error.getMessage());
-//            Временно так ошибку создаем
-            throw new Error("Не валидный токен");
-        }
+    public boolean isTokenValid(String token, UserDetails userDetails){
+        final String username = extractLogin(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-
-
-    private Date extractExpireDate(String token){
-        Date expiration = extractClaim(token, Claims::getExpiration);
-        return expiration;
+    private Key getSignInKey(String key) {
+        byte[] keyBytes = Decoders.BASE64.decode(key);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public boolean isTokenExpired(String token){
-        return extractExpireDate(token).before(new Date());
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
     }
 
+    private Date extractExpiration(String token) {
+
+        return extractClaim(token, Claims::getExpiration);
+    }
+
+//    Под вопросом
+//    public Boolean validateToken(String token) {
+//        String userEmail = extractUserName(token);
+//        if (StringUtils.isNotEmpty(userEmail) && !isTokenExpired(token)) {
+//            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+//            return isTokenValid(token, userDetails);
+//        }
+//        return false;
+//    }
 }

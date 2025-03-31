@@ -1,12 +1,15 @@
 package com.example.auth.config;
 
-import com.example.auth.jwt.JwtTokenFilter;
 import com.example.constant.RolesName;
+import com.example.auth.jwt.JwtAuthFilter;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -15,53 +18,56 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
+
+import com.example.constant.APIPaths;
+
+
 import java.util.List;
 
-@EnableWebSecurity
 @Configuration
+@EnableWebSecurity
+@AllArgsConstructor
 public class SecurityConfig {
 
-    private final JwtTokenFilter jwtTokenFilter;
-
-    public SecurityConfig(JwtTokenFilter jwtTokenFilter) {
-        this.jwtTokenFilter = jwtTokenFilter;
-    }
+    private final JwtAuthFilter jwtAuthFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // Разрешаем все что нужно для Swagger
+                        // Разрешаем доступ к Swagger и публичным эндпоинтам
                         .requestMatchers(
-                                "/",
+                                "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
-                                "/swagger-ui.html",
                                 "/webjars/**",
-                                "/favicon.ico"
+                                "/auth/register",
+                                "/auth/login",
+                                "/error"
                         ).permitAll()
-                        // Разрешаем auth endpoints
-                        .requestMatchers("/auth/register", "/auth/login").permitAll()
-                        // Разрешаем error endpoint
-                        .requestMatchers("/error").permitAll()
-                        // Настройка доступа для USER
-                        .requestMatchers(HttpMethod.POST, "/request/**").hasAuthority(RolesName.USER.toString())
-                        .requestMatchers(HttpMethod.GET, "/{userId}/grant-role").hasAuthority(RolesName.USER.toString())
-                        .requestMatchers(HttpMethod.PATCH, "/request/{id}/status").hasAuthority(RolesName.USER.toString())
-                        .requestMatchers(HttpMethod.PUT, "/api/users/{userId}/grant-dean-role").hasAuthority(RolesName.USER.toString())
-                        .requestMatchers(HttpMethod.GET, "/request_info/**").hasAnyAuthority(RolesName.USER.toString())
-                        .requestMatchers(HttpMethod.GET, "/request_list").hasAnyAuthority(RolesName.USER.toString())
-                        .requestMatchers(HttpMethod.GET, "/users").hasAnyAuthority(RolesName.USER.toString())
+
+                        // Настройка доступа для ролей
+                        .requestMatchers(HttpMethod.POST, "/request/**").hasAuthority(RolesName.ADMIN.toString())
+                        .requestMatchers(HttpMethod.GET, "/{userId}/grant-role").hasAuthority(RolesName.ADMIN.toString())
+                        .requestMatchers(HttpMethod.PATCH, "/request/{id}/status").hasAuthority(RolesName.ADMIN.toString())
+                        .requestMatchers(HttpMethod.PUT, "/api/users/{userId}/grant-dean-role").hasAuthority(RolesName.ADMIN.toString())
+                        .requestMatchers(HttpMethod.GET, "/request_info/**").hasAuthority(RolesName.ADMIN.toString())
+                        .requestMatchers(HttpMethod.GET, "/request_list").hasAuthority(RolesName.ADMIN.toString())
+                        .requestMatchers(HttpMethod.GET, "/users").hasAuthority(RolesName.ADMIN.toString())
+                        .requestMatchers(HttpMethod.GET, APIPaths.LOGIN).permitAll()
+
                         // Все остальные запросы требуют аутентификации
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -70,7 +76,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:5173"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 
