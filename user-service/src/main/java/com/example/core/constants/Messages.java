@@ -19,4 +19,6 @@ public class Messages {
     public static final String ALREADY_EXISTS = "Такой логин или почта уже используется";
 
     public static final String SUCCESS = "Успех";
+
+    public static final String INCORRECT_LOGIN_OR_PASSWORD = "Неверный логин или пароль";
 }

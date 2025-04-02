@@ -2,6 +2,8 @@ package com.example.api.rest;
 
 import com.example.api.constant.ApiPaths;
 
+import com.example.api.dto.LoginDto;
+import com.example.api.dto.LoginRequestDto;
 import com.example.api.dto.RegistrationDto;
 import com.example.api.dto.RegistrationRequestDto;
 import com.example.core.service.UserService;
@@ -22,8 +24,8 @@ public class UserController {
     }
 
     @PostMapping(ApiPaths.LOGIN)
-    public String login(){
-        return "hello";
+    public LoginDto login(@RequestBody LoginRequestDto loginRequestModel){
+        return userService.logIn(loginRequestModel);
     }
 
     @PostMapping(ApiPaths.LOGOUT)

@@ -1,8 +1,7 @@
 package com.example.core.service;
 
-import com.example.api.dto.RegistrationDto;
-import com.example.api.dto.RegistrationRequestDto;
-import com.example.api.dto.UserRolesDto;
+import com.example.api.dto.*;
+import com.example.auth.service.JwtService;
 import com.example.core.entity.User;
 import com.example.core.entity.UserRoles;
 import com.example.core.mapper.UserMapper;
@@ -18,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -30,6 +30,7 @@ public class UserService {
     private final UserRolesRepository userRolesRepository;
     private final CheckUser checkUser;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
 
     @Transactional
@@ -47,6 +48,22 @@ public class UserService {
             return new RegistrationDto("Account has registered");
         }
     }
+
+    @Transactional
+    public LoginDto logIn(LoginRequestDto loginRequestModel){
+        if (checkUser.isLogin(loginRequestModel.login())
+                && checkUser.correctPasswordCheck(loginRequestModel.login(), loginRequestModel.password())){
+            UUID userId = userRepository.findIdByLogin(loginRequestModel.login());
+            List<String> userRoles = userRolesRepository.findRoleNamesByUserId(userId.toString());
+            String accessToken = jwtService.generateAccessToken(userId.toString(), loginRequestModel.login(), userRoles);
+            String refreshToken = jwtService.generateRefreshToken(userId.toString(), loginRequestModel.login());
+            return new LoginDto(accessToken, refreshToken);
+        }
+        else{
+            throw new CustomException(Messages.INCORRECT_LOGIN_OR_PASSWORD, ExceptionType.NOT_FOUND);
+        }
+    }
+
 
 
 }
