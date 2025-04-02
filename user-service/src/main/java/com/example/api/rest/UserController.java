@@ -2,6 +2,9 @@ package com.example.api.rest;
 
 import com.example.api.constant.ApiPaths;
 
+import com.example.api.dto.RegistrationDto;
+import com.example.api.dto.RegistrationRequestDto;
+import com.example.core.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,10 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/user")
 public class UserController {
 
-    @GetMapping("/registration")
-    public String registration(){
-        System.out.println("🚀 Контроллер получил запрос!");
-        return "hello";
+    private final UserService userService;
+
+    @PostMapping(ApiPaths.REGISTRATION)
+    public RegistrationDto registration(@RequestBody RegistrationRequestDto registModel){
+        return userService.register(registModel);
     }
 
     @PostMapping(ApiPaths.LOGIN)

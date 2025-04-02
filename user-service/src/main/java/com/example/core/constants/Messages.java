@@ -15,4 +15,8 @@ public class Messages {
     public static final String BLOCKED_ACCOUNT = "Ваш аккаунт заблокирован";
 
     public static final String PERSONAL_DATA_INVALID = "Неверный формат персональных данных";
+
+    public static final String ALREADY_EXISTS = "Такой логин или почта уже используется";
+
+    public static final String SUCCESS = "Успех";
 }

@@ -52,7 +52,7 @@ public class SecurityConfig {
                         ).permitAll()
 //                        .requestMatchers("/api/user/registration").permitAll()
                         // Настройка доступа для ролей
-//                        .requestMatchers(HttpMethod.GET, "/api/user/registration").hasAuthority(RolesName.ADMIN.toString())
+                        .requestMatchers(HttpMethod.POST, "/api/user/registration").permitAll()
 //                        .requestMatchers(HttpMethod.GET, "/{userId}/grant-role").hasAuthority(RolesName.ADMIN.toString())
 //                        .requestMatchers(HttpMethod.PATCH, "/request/{id}/status").hasAuthority(RolesName.ADMIN.toString())
 //                        .requestMatchers(HttpMethod.PUT, "/api/users/{userId}/grant-dean-role").hasAuthority(RolesName.ADMIN.toString())

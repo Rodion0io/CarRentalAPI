@@ -54,6 +54,9 @@ public class User {
     @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime blockedAt;
 
+    @Column(name = "is_blocked")
+    private boolean isBlocked;
+
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
