@@ -64,6 +64,8 @@ public class UserService {
         }
     }
 
+    @Transactional
+    public UserProfileDto getPersonalProfile(String token){
 
-
+    }
 }

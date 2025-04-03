@@ -4,10 +4,14 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class ApiPaths {
-//    Временно столько ролей, со времененм они будут добавляться
-    public static final String LOGIN = "/login";
 
-    public static final String LOGOUT = "/logout";
+    private static final String partLink = "/api/user/";
 
-    public static final String REGISTRATION = "/registration";
+    public static final String LOGIN = partLink + "login";
+
+    public static final String LOGOUT = partLink + "logout";
+
+    public static final String REGISTRATION = partLink + "registration";
+
+    public static final String PERSONAL_PROFILE = partLink + "myprofile";
 }

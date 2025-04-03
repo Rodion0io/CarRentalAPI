@@ -1,5 +1,6 @@
 package com.example.auth.config;
 
+import com.example.api.constant.ApiPaths;
 import com.example.auth.jwt.JwtAuthFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -39,13 +40,12 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
                                 "/webjars/**",
-                                "/api/user/registration",
-                                "/api/user/login",
+                                ApiPaths.REGISTRATION,
+                                ApiPaths.LOGIN,
                                 "/error"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/user/registration", "/api/user/login").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/{userId}/grant-role").hasAuthority(RolesName.ADMIN.toString())
-//                        .requestMatchers(HttpMethod.PATCH, "/request/{id}/status").hasAuthority(RolesName.ADMIN.toString())
+                        .requestMatchers(HttpMethod.POST, ApiPaths.LOGIN, ApiPaths.REGISTRATION).permitAll()
+                        .requestMatchers(HttpMethod.GET, ApiPaths.PERSONAL_PROFILE).authenticated()
 //                        .requestMatchers(HttpMethod.PUT, "/api/users/{userId}/grant-dean-role").hasAuthority(RolesName.ADMIN.toString())
 //                        .requestMatchers(HttpMethod.GET, "/request_info/**").hasAuthority(RolesName.ADMIN.toString())
 //                        .requestMatchers(HttpMethod.GET, "/request_list").hasAuthority(RolesName.ADMIN.toString())

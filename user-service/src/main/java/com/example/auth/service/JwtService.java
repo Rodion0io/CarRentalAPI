@@ -84,14 +84,4 @@ public class JwtService {
 
         return extractClaim(token, Claims::getExpiration);
     }
-
-//    Под вопросом
-//    public Boolean validateToken(String token) {
-//        String userEmail = extractUserName(token);
-//        if (StringUtils.isNotEmpty(userEmail) && !isTokenExpired(token)) {
-//            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-//            return isTokenValid(token, userDetails);
-//        }
-//        return false;
-//    }
 }
