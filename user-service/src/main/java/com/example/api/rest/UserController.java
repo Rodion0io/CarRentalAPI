@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class UserController {
@@ -24,9 +26,14 @@ public class UserController {
         return userService.logIn(loginRequestModel);
     }
 
-    @PostMapping(ApiPaths.PERSONAL_PROFILE)
+    @GetMapping(ApiPaths.PERSONAL_PROFILE)
     public UserProfileDto personalProfile(@RequestHeader("Authorization") String authHeader){
         return userService.getPersonalProfile(authHeader.substring(7));
+    }
+
+    @GetMapping(ApiPaths.USER_ROLES_PATH)
+    public List<UserRolesDto> userRoles(@RequestHeader("Authorization") String authHeader){
+        return userService.getUserRoles(authHeader.substring(7));
     }
 
     @PostMapping(ApiPaths.LOGOUT)

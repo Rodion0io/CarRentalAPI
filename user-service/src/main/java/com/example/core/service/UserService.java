@@ -12,15 +12,15 @@ import com.example.core.repository.UserRolesRepository;
 import com.example.exception.ExceptionType;
 
 import com.example.exception.CustomException;
-import io.jsonwebtoken.Claims;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -69,9 +69,24 @@ public class UserService {
 
     @Transactional
     public UserProfileDto getPersonalProfile(String token) {
-        UUID userId = UUID.fromString(jwtService.extractClaim(token, claims -> claims.get("sub", String.class)));
+        UUID userId = jwtService.extractUserId(token);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
         return userMapper.map(user);
+    }
+
+    @Transactional
+    public List<UserRolesDto> getUserRoles(String token){
+        UUID userId = jwtService.extractUserId(token);
+        List<UserRolesDto> userRoles = new ArrayList<>();
+        List<String> userRolesIdList = userRolesRepository.findRoleIdByUserId(userId.toString());
+        List<String> userRolesNameList = userRolesRepository.findRoleNamesByUserId(userId.toString());
+
+        for (int i = 0; i < userRolesIdList.size(); i++){
+            UserRolesDto roleModel = new UserRolesDto(userRolesIdList.get(i), userRolesNameList.get(i));
+            userRoles.add(roleModel);
+        }
+
+        return userRoles;
     }
 }

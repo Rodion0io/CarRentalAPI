@@ -46,7 +46,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers(HttpMethod.POST, ApiPaths.LOGIN, ApiPaths.REGISTRATION).permitAll()
                         .requestMatchers(HttpMethod.GET, ApiPaths.PERSONAL_PROFILE).authenticated()
-//                        .requestMatchers(HttpMethod.PUT, "/api/users/{userId}/grant-dean-role").hasAuthority(RolesName.ADMIN.toString())
+                        .requestMatchers(HttpMethod.GET, ApiPaths.USER_ROLES_PATH).authenticated()
 //                        .requestMatchers(HttpMethod.GET, "/request_info/**").hasAuthority(RolesName.ADMIN.toString())
 //                        .requestMatchers(HttpMethod.GET, "/request_list").hasAuthority(RolesName.ADMIN.toString())
 //                        .requestMatchers(HttpMethod.GET, "/users").hasAuthority(RolesName.ADMIN.toString())

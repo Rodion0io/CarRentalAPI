@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Service
@@ -74,6 +75,10 @@ public class JwtService {
     private Key getSignInKey(String key) {
         byte[] keyBytes = Decoders.BASE64.decode(key);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public UUID extractUserId(String token){
+        return UUID.fromString(extractClaim(token, claims -> claims.get("sub", String.class)));
     }
 
     private boolean isTokenExpired(String token) {
