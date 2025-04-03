@@ -53,7 +53,7 @@ public class UserService {
     public LoginDto logIn(LoginRequestDto loginRequestModel){
         if (checkUser.isLogin(loginRequestModel.login())
                 && checkUser.correctPasswordCheck(loginRequestModel.login(), loginRequestModel.password())){
-            UUID userId = userRepository.findIdByLogin(loginRequestModel.login());
+            UUID userId = userRepository.findIdByLogin(loginRequestModel.login()).getId();
             List<String> userRoles = userRolesRepository.findRoleNamesByUserId(userId.toString());
             String accessToken = jwtService.generateAccessToken(userId.toString(), loginRequestModel.login(), userRoles);
             String refreshToken = jwtService.generateRefreshToken(userId.toString(), loginRequestModel.login());

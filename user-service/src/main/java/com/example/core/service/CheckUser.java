@@ -26,7 +26,7 @@ public class CheckUser {
     }
 
     boolean correctPasswordCheck(String login, String enteredPassword){
-        String password = userRepository.findPasswordByLogin(login);
+        String password = userRepository.findPasswordByLogin(login).getPassword();
         if (passwordEncoder.matches(enteredPassword, password)){
             return true;
         }

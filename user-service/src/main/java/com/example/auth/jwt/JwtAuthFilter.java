@@ -27,21 +27,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        // Список публичных маршрутов
         List<String> publicEndpoints = List.of(
-                "/auth/register",
-                "/auth/login",
-                "/api/user/registration"
+                "/api/user/registration",
+                "/api/user/login"
         );
 
-        // Проверяем, не является ли текущий запрос публичным
         String requestURI = request.getRequestURI();
         if (publicEndpoints.contains(requestURI)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Дальше идет стандартная логика проверки JWT
         String token = getToken(request);
         String login = jwtService.extractLogin(token);
 

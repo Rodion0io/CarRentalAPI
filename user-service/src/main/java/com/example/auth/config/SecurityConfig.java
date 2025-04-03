@@ -1,15 +1,12 @@
 package com.example.auth.config;
 
-import com.example.constant.RolesName;
 import com.example.auth.jwt.JwtAuthFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -17,10 +14,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-
-import com.example.constant.APIPaths;
-
 
 import java.util.List;
 
@@ -46,13 +39,11 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
                                 "/webjars/**",
-                                "/auth/register",
-                                "/auth/login",
+                                "/api/user/registration",
+                                "/api/user/login",
                                 "/error"
                         ).permitAll()
-//                        .requestMatchers("/api/user/registration").permitAll()
-                        // Настройка доступа для ролей
-                        .requestMatchers(HttpMethod.POST, "/api/user/registration").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/user/registration", "/api/user/login").permitAll()
 //                        .requestMatchers(HttpMethod.GET, "/{userId}/grant-role").hasAuthority(RolesName.ADMIN.toString())
 //                        .requestMatchers(HttpMethod.PATCH, "/request/{id}/status").hasAuthority(RolesName.ADMIN.toString())
 //                        .requestMatchers(HttpMethod.PUT, "/api/users/{userId}/grant-dean-role").hasAuthority(RolesName.ADMIN.toString())
@@ -73,7 +64,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedOrigins(List.of("http://localhost:9000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
