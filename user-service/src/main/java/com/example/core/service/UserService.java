@@ -12,12 +12,15 @@ import com.example.core.repository.UserRolesRepository;
 import com.example.exception.ExceptionType;
 
 import com.example.exception.CustomException;
+import io.jsonwebtoken.Claims;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -65,7 +68,10 @@ public class UserService {
     }
 
     @Transactional
-    public UserProfileDto getPersonalProfile(String token){
-
+    public UserProfileDto getPersonalProfile(String token) {
+        UUID userId = UUID.fromString(jwtService.extractClaim(token, claims -> claims.get("sub", String.class)));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        return userMapper.map(user);
     }
 }
