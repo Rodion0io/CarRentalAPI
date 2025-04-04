@@ -1,5 +1,6 @@
 package com.example.auth.jwt;
 
+import com.example.api.constant.ApiPaths;
 import com.example.auth.service.JwtService;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.FilterChain;
@@ -26,43 +27,61 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        List<String> publicEndpoints = List.of(
-                "/api/user/registration",
-                "/api/user/login"
-        );
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
 
-        String requestURI = request.getRequestURI();
-        if (publicEndpoints.contains(requestURI)) {
+        final String requestURI = request.getRequestURI();
+
+        // Список публичных эндпоинтов, которые не требуют аутентификации
+        if (isPublicEndpoint(requestURI)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String token = getToken(request);
-        String login = jwtService.extractLogin(token);
+        // Получаем токен из заголовка
+        final String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-        if (StringUtils.isNotEmpty(login) && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(login);
-            if (jwtService.isTokenValid(token, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+        // Извлекаем JWT токен
+        final String jwt = authHeader.substring(7);
+
+        try {
+            // Проверяем токен
+            final String userEmail = jwtService.extractLogin(jwt);
+
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+
+                if (jwtService.isTokenValid(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+        } catch (Exception e) {
+            // В случае ошибки просто пропускаем запрос дальше
+            // Можно добавить логирование ошибки
         }
 
         filterChain.doFilter(request, response);
     }
 
-
-    private String getToken(HttpServletRequest request){
-        String bearerToken = request.getHeader("Authorization");
-        String token = "";
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")){
-            token = bearerToken.substring(7);
-        }
-        else{
-            token = "";
-        }
-        return token;
+    private boolean isPublicEndpoint(String requestURI) {
+        return requestURI.startsWith("/swagger-ui") ||
+                requestURI.startsWith("/v3/api-docs") ||
+                requestURI.startsWith("/webjars") ||
+                requestURI.startsWith("/swagger-resources") ||
+                requestURI.equals("/error") ||
+                requestURI.equals(ApiPaths.LOGIN) ||
+                requestURI.equals(ApiPaths.REGISTRATION);
     }
 }

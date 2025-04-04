@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,13 +32,20 @@ public class UserController {
         return userService.getPersonalProfile(authHeader.substring(7));
     }
 
+    //Надо пересмотреть(можно будет просто по id выдавать роль
     @GetMapping(ApiPaths.USER_ROLES_PATH)
     public List<UserRolesDto> userRoles(@RequestHeader("Authorization") String authHeader){
         return userService.getUserRoles(authHeader.substring(7));
     }
 
-    @PostMapping(ApiPaths.LOGOUT)
-    public String logout(){
-        return "hello";
+
+    @GetMapping(ApiPaths.USERS_LIST)
+    public List<UserProfileDto> usersProfiles(@RequestParam List<UUID> usersId){
+        return userService.getUsersList(usersId);
     }
+
+//    @PostMapping(ApiPaths.LOGOUT)
+//    public String logout(){
+//        return "hello";
+//    }
 }

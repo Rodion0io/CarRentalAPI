@@ -2,6 +2,7 @@ package com.example.auth.config;
 
 import com.example.api.constant.ApiPaths;
 import com.example.auth.jwt.JwtAuthFilter;
+import com.example.constant.RolesName;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,7 +48,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, ApiPaths.LOGIN, ApiPaths.REGISTRATION).permitAll()
                         .requestMatchers(HttpMethod.GET, ApiPaths.PERSONAL_PROFILE).authenticated()
                         .requestMatchers(HttpMethod.GET, ApiPaths.USER_ROLES_PATH).authenticated()
-//                        .requestMatchers(HttpMethod.GET, "/request_info/**").hasAuthority(RolesName.ADMIN.toString())
+                        .requestMatchers(HttpMethod.GET, ApiPaths.USERS_LIST).hasAnyAuthority(RolesName.ADMIN)
 //                        .requestMatchers(HttpMethod.GET, "/request_list").hasAuthority(RolesName.ADMIN.toString())
 //                        .requestMatchers(HttpMethod.GET, "/users").hasAuthority(RolesName.ADMIN.toString())
 

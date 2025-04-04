@@ -89,4 +89,16 @@ public class UserService {
 
         return userRoles;
     }
+
+    @Transactional
+    public List<UserProfileDto> getUsersList(List<UUID> usersId){
+        List<UserProfileDto> usersList = new ArrayList<>();
+        for (int i = 0; i < usersId.size(); i++){
+            User user = userRepository.findById(usersId.get(i))
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: "));
+            UserProfileDto userDto = userMapper.map(user);
+            usersList.add(userDto);
+        }
+        return usersList;
+    }
 }
