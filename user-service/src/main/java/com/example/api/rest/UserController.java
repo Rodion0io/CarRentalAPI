@@ -43,4 +43,9 @@ public class UserController {
     public List<UserProfileDto> usersProfiles(@RequestParam List<UUID> usersId){
         return userService.getUsersList(usersId);
     }
+
+    @PutMapping(ApiPaths.UPDATE_PROFILE)
+    public String updateProfile(@RequestBody UserUpdateDto updateModel, @RequestHeader("Authorization") String authHeader){
+        return "hhhh";
+    }
 }

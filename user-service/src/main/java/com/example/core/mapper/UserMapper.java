@@ -2,6 +2,7 @@ package com.example.core.mapper;
 
 import com.example.api.dto.RegistrationRequestDto;
 import com.example.api.dto.UserProfileDto;
+import com.example.api.dto.UserUpdateDto;
 import com.example.core.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -15,7 +16,21 @@ public interface UserMapper {
     @Mapping(target = "password", source = "encode")
     User map(RegistrationRequestDto registrationRequestDto, String encode);
 
+    @Mapping(target = "name", source = "updateDto.name", nullValuePropertyMappingStrategy =
+            NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "surname", source = "updateDto.surname", nullValuePropertyMappingStrategy =
+            NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "middlename", source = "updateDto.middlename", nullValuePropertyMappingStrategy =
+            NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "email", source = "updateDto.email", nullValuePropertyMappingStrategy =
+            NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "phone", source = "updateDto.phone", nullValuePropertyMappingStrategy =
+            NullValuePropertyMappingStrategy.IGNORE)
+    User map(UserUpdateDto updateDto);
+
     @Mapping(target = "middlename", source = "middlename", nullValuePropertyMappingStrategy =
             NullValuePropertyMappingStrategy.IGNORE)
     UserProfileDto map(User user);
+
+
 }

@@ -101,4 +101,10 @@ public class UserService {
         }
         return usersList;
     }
+
+    @Transactional
+    public String updateProfile(UserUpdateDto updateModel, String token){
+//        UUID userId = jwtService.extractUserId(token);
+
+    }
 }
