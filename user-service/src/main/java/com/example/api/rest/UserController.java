@@ -43,9 +43,4 @@ public class UserController {
     public List<UserProfileDto> usersProfiles(@RequestParam List<UUID> usersId){
         return userService.getUsersList(usersId);
     }
-
-//    @PostMapping(ApiPaths.LOGOUT)
-//    public String logout(){
-//        return "hello";
-//    }
 }

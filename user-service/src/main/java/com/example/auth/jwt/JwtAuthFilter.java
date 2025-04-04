@@ -2,7 +2,6 @@ package com.example.auth.jwt;
 
 import com.example.api.constant.ApiPaths;
 import com.example.auth.service.JwtService;
-import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,25 +33,23 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         final String requestURI = request.getRequestURI();
 
-        // Список публичных эндпоинтов, которые не требуют аутентификации
         if (isPublicEndpoint(requestURI)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Получаем токен из заголовка
+
         final String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Извлекаем JWT токен
         final String jwt = authHeader.substring(7);
 
         try {
-            // Проверяем токен
             final String userEmail = jwtService.extractLogin(jwt);
+
 
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
@@ -68,8 +65,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            // В случае ошибки просто пропускаем запрос дальше
-            // Можно добавить логирование ошибки
+            SecurityContextHolder.clearContext();
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+            return;
         }
 
         filterChain.doFilter(request, response);

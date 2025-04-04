@@ -48,7 +48,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, ApiPaths.LOGIN, ApiPaths.REGISTRATION).permitAll()
                         .requestMatchers(HttpMethod.GET, ApiPaths.PERSONAL_PROFILE).authenticated()
                         .requestMatchers(HttpMethod.GET, ApiPaths.USER_ROLES_PATH).authenticated()
-                        .requestMatchers(HttpMethod.GET, ApiPaths.USERS_LIST).hasAnyAuthority(RolesName.ADMIN)
+                        .requestMatchers(HttpMethod.GET, ApiPaths.USERS_LIST).hasAnyAuthority(RolesName.ADMIN.toString())
 //                        .requestMatchers(HttpMethod.GET, "/request_list").hasAuthority(RolesName.ADMIN.toString())
 //                        .requestMatchers(HttpMethod.GET, "/users").hasAuthority(RolesName.ADMIN.toString())
 
