@@ -54,6 +54,6 @@ public class UserController {
 
     @DeleteMapping(ApiPaths.REMOVE_ROLE)
     public ResponseDto removeRole(@PathVariable("id") UUID userId, @RequestParam("roleId") UUID roleId){
-        return new ResponseDto(200, "fdhgj");
+        return userService.RemoveRole(userId, roleId);
     }
 }

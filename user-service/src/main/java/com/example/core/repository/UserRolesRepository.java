@@ -23,4 +23,7 @@ public interface UserRolesRepository extends JpaRepository<UserRoles, UUID> {
     @Query("SELECT r.id FROM Roles r WHERE CAST(r.id AS string) IN " +
             "(SELECT ur.role_id FROM UserRoles ur WHERE ur.user_id = :user_id)")
     List<String> findRoleIdByUserId(@Param("user_id") String userId);
+
+    @Query("SELECT ur FROM UserRoles ur WHERE ur.user_id = :user_id AND ur.role_id = :role_id")
+    Optional<UserRoles> findRole(@Param("user_id") String userId, @Param("role_id") String roleId);
 }

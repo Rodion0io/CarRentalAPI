@@ -136,7 +136,18 @@ public class UserService {
     }
 
     @Transactional
-    public ResponseDto RemoveModel(UUID userId, UUID roleId){
-
+    public ResponseDto RemoveRole(UUID userId, UUID roleId){
+        rolesRepository.findById(roleId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        List<String> userRoles = userRolesRepository.findRoleIdByUserId(userId.toString());
+        if (userRoles.contains(roleId)){
+            UserRoles role = userRolesRepository.findRole(userId.toString(), roleId.toString())
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+            userRolesRepository.delete(role);
+            return new ResponseDto(200, "Removed role");
+        }
+        else{
+            return new ResponseDto(400, "Error");
+        }
     }
 }
