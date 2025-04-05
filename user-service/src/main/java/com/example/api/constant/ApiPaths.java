@@ -20,4 +20,5 @@ public class ApiPaths {
     public static final String USERS_LIST = PART_USER_LINK + "userslist";
 
     public static final String UPDATE_PROFILE = PART_USER_LINK + "update";
+
 }

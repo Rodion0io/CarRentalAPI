@@ -6,6 +6,7 @@ import com.example.api.dto.UserUpdateDto;
 import com.example.core.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
@@ -26,7 +27,9 @@ public interface UserMapper {
             NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "phone", source = "updateDto.phone", nullValuePropertyMappingStrategy =
             NullValuePropertyMappingStrategy.IGNORE)
-    User map(UserUpdateDto updateDto);
+    @Mapping(target = "password", source = "encode", nullValuePropertyMappingStrategy =
+            NullValuePropertyMappingStrategy.IGNORE)
+    User map(@MappingTarget User user, UserUpdateDto updateDto, String encode);
 
     @Mapping(target = "middlename", source = "middlename", nullValuePropertyMappingStrategy =
             NullValuePropertyMappingStrategy.IGNORE)

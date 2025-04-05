@@ -19,7 +19,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,14 +30,14 @@ public class UserService {
     private final UserRolesMapper userRolesMapper;
     private final UserRepository userRepository;
     private final UserRolesRepository userRolesRepository;
-    private final CheckUser checkUser;
+    private final ValidService validationServ;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
 
     @Transactional
     public RegistrationDto register(RegistrationRequestDto registrationModel){
-        if (checkUser.isUniqueEmailAndLogin(registrationModel.login(), registrationModel.email())){
+        if (validationServ.isUniqueEmailAndLogin(registrationModel.login(), registrationModel.email())){
             throw new CustomException(Messages.ALREADY_EXISTS, ExceptionType.ALREADY_EXIST);
         }
         else{
@@ -54,8 +53,8 @@ public class UserService {
 
     @Transactional
     public LoginDto logIn(LoginRequestDto loginRequestModel){
-        if (checkUser.isLogin(loginRequestModel.login())
-                && checkUser.correctPasswordCheck(loginRequestModel.login(), loginRequestModel.password())){
+        if (validationServ.isLogin(loginRequestModel.login())
+                && validationServ.correctPasswordCheck(loginRequestModel.login(), loginRequestModel.password())){
             UUID userId = userRepository.findIdByLogin(loginRequestModel.login()).getId();
             List<String> userRoles = userRolesRepository.findRoleNamesByUserId(userId.toString());
             String accessToken = jwtService.generateAccessToken(userId.toString(), loginRequestModel.login(), userRoles);
@@ -71,7 +70,7 @@ public class UserService {
     public UserProfileDto getPersonalProfile(String token) {
         UUID userId = jwtService.extractUserId(token);
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
         return userMapper.map(user);
     }
 
@@ -95,7 +94,7 @@ public class UserService {
         List<UserProfileDto> usersList = new ArrayList<>();
         for (int i = 0; i < usersId.size(); i++){
             User user = userRepository.findById(usersId.get(i))
-                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: "));
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
             UserProfileDto userDto = userMapper.map(user);
             usersList.add(userDto);
         }
@@ -103,8 +102,17 @@ public class UserService {
     }
 
     @Transactional
-    public String updateProfile(UserUpdateDto updateModel, String token){
-//        UUID userId = jwtService.extractUserId(token);
-
+    public ResponseDto updateProfile(UserUpdateDto updateModel, String token){
+        if (validationServ.isUniqueEmailAndLogin(updateModel.login(), updateModel.email())){
+            throw new CustomException(Messages.ALREADY_EXISTS, ExceptionType.ALREADY_EXIST);
+        }
+        else{
+            UUID userId = jwtService.extractUserId(token);
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+            User updatedUser = userMapper.map(user, updateModel, passwordEncoder.encode(updateModel.password()));
+            userRepository.save(updatedUser);
+            return new ResponseDto(200,"Updated");
+        }
     }
 }

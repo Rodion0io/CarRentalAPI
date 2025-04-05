@@ -32,12 +32,10 @@ public class UserController {
         return userService.getPersonalProfile(authHeader.substring(7));
     }
 
-    //Надо пересмотреть(можно будет просто по id выдавать роль
     @GetMapping(ApiPaths.USER_ROLES_PATH)
     public List<UserRolesDto> userRoles(@RequestHeader("Authorization") String authHeader){
         return userService.getUserRoles(authHeader.substring(7));
     }
-
 
     @GetMapping(ApiPaths.USERS_LIST)
     public List<UserProfileDto> usersProfiles(@RequestParam List<UUID> usersId){
@@ -45,7 +43,7 @@ public class UserController {
     }
 
     @PutMapping(ApiPaths.UPDATE_PROFILE)
-    public String updateProfile(@RequestBody UserUpdateDto updateModel, @RequestHeader("Authorization") String authHeader){
-        return "hhhh";
+    public ResponseDto updateProfile(@RequestBody UserUpdateDto updateModel, @RequestHeader("Authorization") String authHeader){
+        return userService.updateProfile(updateModel, authHeader.substring(7));
     }
 }

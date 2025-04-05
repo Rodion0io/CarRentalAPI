@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CheckUser {
+public class ValidService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -32,4 +32,5 @@ public class CheckUser {
         }
         return false;
     }
+
 }
