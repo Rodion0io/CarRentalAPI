@@ -21,4 +21,7 @@ public class ApiPaths {
 
     public static final String UPDATE_PROFILE = PART_USER_LINK + "update";
 
+    public static final String ADD_ROLE = PART_USER_LINK + "newRole/{id}";
+
+    public static final String REMOVE_ROLE = PART_USER_LINK + "deleteRole/{id}";
 }

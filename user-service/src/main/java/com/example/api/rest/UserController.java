@@ -46,4 +46,14 @@ public class UserController {
     public ResponseDto updateProfile(@RequestBody UserUpdateDto updateModel, @RequestHeader("Authorization") String authHeader){
         return userService.updateProfile(updateModel, authHeader.substring(7));
     }
+
+    @PutMapping(ApiPaths.ADD_ROLE)
+    public ResponseDto addRole(@PathVariable("id") UUID userId, @RequestBody RoleDto model){
+        return userService.AddRole(model, userId);
+    }
+
+    @DeleteMapping(ApiPaths.REMOVE_ROLE)
+    public ResponseDto removeRole(@PathVariable("id") UUID userId, @RequestParam("roleId") UUID roleId){
+        return new ResponseDto(200, "fdhgj");
+    }
 }

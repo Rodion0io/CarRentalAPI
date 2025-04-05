@@ -1,6 +1,7 @@
 package com.example.auth.config;
 
 import com.example.api.constant.ApiPaths;
+import com.example.api.dto.RoleDto;
 import com.example.auth.jwt.JwtAuthFilter;
 import com.example.constant.RolesName;
 import lombok.AllArgsConstructor;
@@ -49,7 +50,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, ApiPaths.PERSONAL_PROFILE).authenticated()
                         .requestMatchers(HttpMethod.GET, ApiPaths.USER_ROLES_PATH).authenticated()
                         .requestMatchers(HttpMethod.GET, ApiPaths.USERS_LIST).hasAnyAuthority(RolesName.ADMIN.toString())
-//                        .requestMatchers(HttpMethod.GET, "/users").hasAuthority(RolesName.ADMIN.toString())
+                        .requestMatchers(HttpMethod.PUT, ApiPaths.ADD_ROLE).hasAnyAuthority(RolesName.ADMIN.toString())
 
                         .anyRequest().authenticated()
                 )

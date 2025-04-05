@@ -6,6 +6,7 @@ import com.example.core.entity.User;
 import com.example.core.entity.UserRoles;
 import com.example.core.mapper.UserMapper;
 import com.example.core.mapper.UserRolesMapper;
+import com.example.core.repository.RolesRepository;
 import com.example.core.repository.UserRepository;
 import com.example.core.constants.Messages;
 import com.example.core.repository.UserRolesRepository;
@@ -30,6 +31,7 @@ public class UserService {
     private final UserRolesMapper userRolesMapper;
     private final UserRepository userRepository;
     private final UserRolesRepository userRolesRepository;
+    private final RolesRepository rolesRepository;
     private final ValidService validationServ;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -114,5 +116,27 @@ public class UserService {
             userRepository.save(updatedUser);
             return new ResponseDto(200,"Updated");
         }
+    }
+
+    @Transactional
+    public ResponseDto AddRole(RoleDto model, UUID userId){
+        // Проверить существование роли, наличие у пользователя выбранной роли
+        rolesRepository.findById(model.roleId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        List<String> userRoles = userRolesRepository.findRoleIdByUserId(userId.toString());
+        if (!userRoles.contains(model.roleId())){
+            UserRolesDto firstRoles = new UserRolesDto(userId.toString(), model.roleId().toString());
+            UserRoles roles = userRolesMapper.map(firstRoles);
+            userRolesRepository.save(roles);
+            return new ResponseDto(200, "Added new role");
+        }
+        else{
+            return new ResponseDto(401, "The user already has this role.");
+        }
+    }
+
+    @Transactional
+    public ResponseDto RemoveModel(UUID userId, UUID roleId){
+
     }
 }

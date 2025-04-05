@@ -13,4 +13,6 @@ public interface UserRolesMapper {
     @Mapping(source = "userId", target = "user_id")
     @Mapping(source = "roleId", target = "role_id")
     UserRoles map(UserRolesDto userRolesDto);
+
+
 }
