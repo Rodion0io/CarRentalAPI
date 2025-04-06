@@ -41,10 +41,11 @@ public class JwtService {
                 .compact();
     }
 
-    public String generateRefreshToken(String userId, String login) {
+    public String generateRefreshToken(String userId, String login, List<String> roles) {
         return Jwts.builder()
                 .setSubject(userId)
                 .claim("login", login)
+                .claim("roles", roles)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24)) // 1 day
                 .signWith(getSignInKey(REFRESH_TOKEN), SignatureAlgorithm.HS256)
@@ -65,6 +66,10 @@ public class JwtService {
 
     public String extractLogin(String token) {
         return extractClaim(token, claims -> claims.get("login", String.class));
+    }
+
+    public List<String> extractRoles(String token){
+        return extractClaim(token, claims -> claims.get("roles", List<String>.class))
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails){

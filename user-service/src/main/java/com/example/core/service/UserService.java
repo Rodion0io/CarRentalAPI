@@ -64,7 +64,7 @@ public class UserService {
             if (blackListService.inBlackList(accessToken)){
                 throw new CustomException(Messages.INCORRECT_TOKEN, ExceptionType.UNAUTHORIZED);
             }
-            String refreshToken = jwtService.generateRefreshToken(userId.toString(), loginRequestModel.login());
+            String refreshToken = jwtService.generateRefreshToken(userId.toString(), loginRequestModel.login(), userRoles);
             return new LoginDto(accessToken, refreshToken);
         }
         else{
@@ -159,5 +159,18 @@ public class UserService {
     public ResponseDto Logout(String token){
         blackListService.addInBlackList(token);
         return new ResponseDto(200, "Is logout");
+    }
+
+    @Transactional
+    public LoginDto RefreshToken(String refresh){
+        UUID userId = jwtService.extractUserId(refresh);
+        String login = jwtService.extractLogin(refresh);
+
+        String accessToken = jwtService.generateAccessToken(userId.toString(), login, );
+        if (blackListService.inBlackList(accessToken)){
+            throw new CustomException(Messages.INCORRECT_TOKEN, ExceptionType.UNAUTHORIZED);
+        }
+//        String refreshToken = jwtService.generateRefreshToken(userId.toString(), loginRequestModel.login());
+//        return new LoginDto(accessToken, refreshToken);
     }
 }

@@ -62,4 +62,9 @@ public class UserController {
     public ResponseDto Logout(@RequestHeader("Authorization") String authHeader){
         return userService.Logout(authHeader.substring(7));
     }
+
+    @PostMapping(ApiPaths.REFRESH)
+    public LoginDto Refresh(@RequestBody RefreshModel model){
+        return userService.RefreshToken(model.refreshToken());
+    }
 }
