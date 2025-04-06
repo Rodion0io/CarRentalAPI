@@ -35,6 +35,7 @@ public class UserService {
     private final ValidService validationServ;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final BlackListService blackListService;
 
 
     @Transactional
@@ -60,6 +61,9 @@ public class UserService {
             UUID userId = userRepository.findIdByLogin(loginRequestModel.login()).getId();
             List<String> userRoles = userRolesRepository.findRoleNamesByUserId(userId.toString());
             String accessToken = jwtService.generateAccessToken(userId.toString(), loginRequestModel.login(), userRoles);
+            if (blackListService.inBlackList(accessToken)){
+                throw new CustomException(Messages.INCORRECT_TOKEN, ExceptionType.UNAUTHORIZED);
+            }
             String refreshToken = jwtService.generateRefreshToken(userId.toString(), loginRequestModel.login());
             return new LoginDto(accessToken, refreshToken);
         }
@@ -155,6 +159,7 @@ public class UserService {
 
     @Transactional
     public ResponseDto Logout(String token){
-
+        blackListService.addInBlackList(token);
+        return new ResponseDto(200, "Is logout");
     }
 }

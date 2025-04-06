@@ -9,4 +9,5 @@ import java.util.UUID;
 
 // это вынесем в папку с общими настрйоками
 public interface BlackListRepository extends JpaRepository<BlackListTokens, UUID> {
+    Optional<BlackListTokens> findByToken(String token);
 }
