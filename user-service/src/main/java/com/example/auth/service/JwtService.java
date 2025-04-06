@@ -68,8 +68,8 @@ public class JwtService {
         return extractClaim(token, claims -> claims.get("login", String.class));
     }
 
-    public List<String> extractRoles(String token){
-        return extractClaim(token, claims -> claims.get("roles", List<String>.class))
+    public List<String> extractRoles(String token) {
+        return extractClaim(token, claims -> (List<String>) claims.get("roles"));
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails){

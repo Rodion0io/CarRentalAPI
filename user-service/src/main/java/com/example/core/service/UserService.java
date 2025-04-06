@@ -165,12 +165,12 @@ public class UserService {
     public LoginDto RefreshToken(String refresh){
         UUID userId = jwtService.extractUserId(refresh);
         String login = jwtService.extractLogin(refresh);
-
-        String accessToken = jwtService.generateAccessToken(userId.toString(), login, );
+        List<String> userRoles = jwtService.extractRoles(refresh);
+        String accessToken = jwtService.generateAccessToken(userId.toString(), login, userRoles);
         if (blackListService.inBlackList(accessToken)){
             throw new CustomException(Messages.INCORRECT_TOKEN, ExceptionType.UNAUTHORIZED);
         }
-//        String refreshToken = jwtService.generateRefreshToken(userId.toString(), loginRequestModel.login());
-//        return new LoginDto(accessToken, refreshToken);
+        String refreshToken = jwtService.generateRefreshToken(userId.toString(), login, userRoles);
+        return new LoginDto(accessToken, refreshToken);
     }
 }
