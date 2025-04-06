@@ -40,7 +40,7 @@ public class UserService {
     @Transactional
     public RegistrationDto register(RegistrationRequestDto registrationModel){
         if (validationServ.isUniqueEmailAndLogin(registrationModel.login(), registrationModel.email())){
-            throw new CustomException(Messages.ALREADY_EXISTS, ExceptionType.ALREADY_EXIST);
+            throw new CustomException("Login is already exists", ExceptionType.ALREADY_EXIST);
         }
         else{
             User user = userMapper.map(registrationModel, passwordEncoder.encode(registrationModel.password()));
@@ -140,7 +140,9 @@ public class UserService {
         rolesRepository.findById(roleId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         List<String> userRoles = userRolesRepository.findRoleIdByUserId(userId.toString());
-        if (userRoles.contains(roleId)){
+        System.out.println("user roles list: " + userRoles);
+        System.out.println("user role: " + roleId);
+        if (userRoles.contains(roleId.toString())){
             UserRoles role = userRolesRepository.findRole(userId.toString(), roleId.toString())
                     .orElseThrow(() -> new EntityNotFoundException("User not found"));
             userRolesRepository.delete(role);
