@@ -2,6 +2,7 @@ package com.example.auth.jwt;
 
 import com.example.api.constant.ApiPaths;
 import com.example.auth.service.JwtService;
+import com.example.core.service.BlackListService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +25,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final BlackListService blackListService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -46,6 +48,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         final String jwt = authHeader.substring(7);
+
+        if (blackListService.inBlackList(jwt)){
+            SecurityContextHolder.clearContext();
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+            return;
+        }
 
         try {
             final String userEmail = jwtService.extractLogin(jwt);

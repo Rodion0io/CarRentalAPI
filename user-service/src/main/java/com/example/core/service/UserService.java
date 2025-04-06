@@ -144,8 +144,6 @@ public class UserService {
         rolesRepository.findById(roleId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         List<String> userRoles = userRolesRepository.findRoleIdByUserId(userId.toString());
-        System.out.println("user roles list: " + userRoles);
-        System.out.println("user role: " + roleId);
         if (userRoles.contains(roleId.toString())){
             UserRoles role = userRolesRepository.findRole(userId.toString(), roleId.toString())
                     .orElseThrow(() -> new EntityNotFoundException("User not found"));

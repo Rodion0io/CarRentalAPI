@@ -4,6 +4,7 @@ import com.example.core.entity.BlackListTokenDto;
 import com.example.core.entity.BlackListTokens;
 import com.example.core.mapper.BlackListMapper;
 import com.example.core.repository.BlackListRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
