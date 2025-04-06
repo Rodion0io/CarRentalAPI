@@ -12,11 +12,3 @@ public class CustomException extends RuntimeException {
         this.type = type;
     }
 }
-
-// пример эксепшн хендлера
-//@Slf4j
-//@ExceptionHandler
-//public ResponseEntity<String> handle(Type exception){
-//    log.error(...)
-//    return new ResponseEntity<>(exception.getMessage(), HttpStatus.ACCEPTED);
-//}

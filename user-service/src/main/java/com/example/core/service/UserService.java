@@ -152,4 +152,9 @@ public class UserService {
             return new ResponseDto(400, "Error");
         }
     }
+
+    @Transactional
+    public ResponseDto Logout(String token){
+
+    }
 }

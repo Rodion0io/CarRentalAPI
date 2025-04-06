@@ -6,6 +6,7 @@ import org.hibernate.annotations.UuidGenerator;
 
 import java.util.UUID;
 
+// это вынесем в папку с общими настрйоками
 @Entity
 @Builder
 @Getter

@@ -1,5 +1,6 @@
 package com.example.config;
 
+import com.example.core.mapper.BlackListMapper;
 import com.example.core.mapper.UserMapper;
 import com.example.core.mapper.UserRolesMapper;
 import org.springframework.context.annotation.Bean;
@@ -16,5 +17,10 @@ public class MapperConfig {
     @Bean
     public UserRolesMapper userRolesMapper(){
         return UserRolesMapper.INSTANCE;
+    }
+
+    @Bean
+    public BlackListMapper blackListMapper(){
+        return BlackListMapper.INSTANCE;
     }
 }
