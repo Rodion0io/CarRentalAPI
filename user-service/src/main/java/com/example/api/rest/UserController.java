@@ -68,6 +68,16 @@ public class UserController {
         return userService.UnBlockUser(userId.toString());
     }
 
+    @PutMapping(ApiPaths.DELETE_ACCOUNT)
+    public ResponseDto DeleteAccount(@RequestHeader("Authorization") String authHeader){
+        return userService.DeleteAccount(authHeader.substring(7));
+    }
+
+    @PutMapping(ApiPaths.RECOVER_ACCOUNT)
+    public ResponseDto RecoverAccount(@RequestHeader("Authorization") String authHeader){
+        return userService.RecoverAccount(authHeader.substring(7));
+    }
+
     @PostMapping(ApiPaths.LOGOUT)
     public ResponseDto Logout(@RequestHeader("Authorization") String authHeader){
         return userService.Logout(authHeader.substring(7));
@@ -77,4 +87,6 @@ public class UserController {
     public LoginDto Refresh(@RequestBody RefreshModel model){
         return userService.RefreshToken(model.refreshToken());
     }
+
+
 }

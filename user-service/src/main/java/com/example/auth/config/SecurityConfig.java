@@ -52,6 +52,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, ApiPaths.USERS_LIST).hasAnyAuthority(RolesName.ADMIN.toString())
                         .requestMatchers(HttpMethod.PUT, ApiPaths.ADD_ROLE, ApiPaths.BLOCK, ApiPaths.UNBLOCK).hasAnyAuthority(RolesName.ADMIN.toString())
                         .requestMatchers(HttpMethod.POST, ApiPaths.LOGOUT).authenticated()
+                        .requestMatchers(HttpMethod.PUT, ApiPaths.DELETE_ACCOUNT, ApiPaths.RECOVER_ACCOUNT).authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

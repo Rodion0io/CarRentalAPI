@@ -30,4 +30,8 @@ public class ApiPaths {
     public static final String BLOCK = PART_USER_LINK + "block/{id}";
 
     public static final String UNBLOCK = PART_USER_LINK + "unblock/{id}";
+
+    public static final String DELETE_ACCOUNT = PART_USER_LINK + "deleteAccount";
+
+    public static final String RECOVER_ACCOUNT = PART_USER_LINK + "recoverAccount";
 }

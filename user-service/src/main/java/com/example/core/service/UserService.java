@@ -213,4 +213,28 @@ public class UserService {
         userRepository.save(user);
         return new ResponseDto(200, "Is unblocked");
     }
+
+    @Transactional
+    public ResponseDto DeleteAccount(String id){
+        User user = userRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new CustomException("User is not found", ExceptionType.NOT_FOUND));
+        if (user.getDeletedAt() != null){
+            throw new CustomException("Account is deleted", ExceptionType.BAD_REQUEST);
+        }
+        user.setDeletedAt(LocalDateTime.now());
+        userRepository.save(user);
+        return new ResponseDto(200, "Is deleted! You can restore your account");
+    }
+
+    @Transactional
+    public ResponseDto RecoverAccount(String id){
+        User user = userRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new CustomException("User is not found", ExceptionType.NOT_FOUND));
+        if (user.getDeletedAt() == null){
+            throw new CustomException("Account isn't delete", ExceptionType.BAD_REQUEST);
+        }
+        user.setDeletedAt(null);
+        userRepository.save(user);
+        return new ResponseDto(200, "Your account has been restored!");
+    }
 }
