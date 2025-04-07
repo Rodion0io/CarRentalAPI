@@ -58,6 +58,16 @@ public class UserController {
         return userService.RemoveRole(userId, roleId);
     }
 
+    @PutMapping(ApiPaths.BLOCK)
+    public ResponseDto BlockUser(@PathVariable("id") UUID userId){
+        return userService.BlockUser(userId.toString());
+    }
+
+    @PutMapping(ApiPaths.UNBLOCK)
+    public ResponseDto UnBlockUser(@PathVariable("id") UUID userId){
+        return userService.UnBlockUser(userId.toString());
+    }
+
     @PostMapping(ApiPaths.LOGOUT)
     public ResponseDto Logout(@RequestHeader("Authorization") String authHeader){
         return userService.Logout(authHeader.substring(7));

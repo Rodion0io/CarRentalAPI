@@ -26,4 +26,8 @@ public class ApiPaths {
     public static final String REMOVE_ROLE = PART_USER_LINK + "deleteRole/{id}";
 
     public static final String REFRESH = PART_USER_LINK + "refresh";
+
+    public static final String BLOCK = PART_USER_LINK + "block/{id}";
+
+    public static final String UNBLOCK = PART_USER_LINK + "unblock/{id}";
 }

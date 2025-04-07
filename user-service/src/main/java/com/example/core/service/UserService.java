@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -187,5 +188,29 @@ public class UserService {
         else{
             throw new CustomException(Messages.NOT_EXPIRED_TOKEN, ExceptionType.UNAUTHORIZED);
         }
+    }
+
+    @Transactional
+    public ResponseDto BlockUser(String userId){
+        User user = userRepository.findById(UUID.fromString(userId))
+                .orElseThrow(() -> new CustomException("User is not found", ExceptionType.NOT_FOUND));
+        if (user.getBlockedAt() != null){
+            throw new CustomException("User is blocked", ExceptionType.BAD_REQUEST);
+        }
+        user.setBlockedAt(LocalDateTime.now());
+        userRepository.save(user);
+        return new ResponseDto(200, "Is blocked!");
+    }
+
+    @Transactional
+    public ResponseDto UnBlockUser(String userId){
+        User user = userRepository.findById(UUID.fromString(userId))
+                .orElseThrow(() -> new CustomException("User is not found", ExceptionType.NOT_FOUND));
+        if (user.getBlockedAt() == null){
+            throw new CustomException("User isn't block", ExceptionType.BAD_REQUEST);
+        }
+        user.setBlockedAt(null);
+        userRepository.save(user);
+        return new ResponseDto(200, "Is unblocked");
     }
 }

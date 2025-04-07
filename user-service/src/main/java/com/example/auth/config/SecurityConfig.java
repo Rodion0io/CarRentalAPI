@@ -48,10 +48,9 @@ public class SecurityConfig {
                                 "/error"
                         ).permitAll()
                         .requestMatchers(HttpMethod.POST, ApiPaths.LOGIN, ApiPaths.REFRESH, ApiPaths.REGISTRATION).permitAll()
-                        .requestMatchers(HttpMethod.GET, ApiPaths.PERSONAL_PROFILE).authenticated()
-                        .requestMatchers(HttpMethod.GET, ApiPaths.USER_ROLES_PATH).authenticated()
+                        .requestMatchers(HttpMethod.GET, ApiPaths.PERSONAL_PROFILE, ApiPaths.USER_ROLES_PATH).authenticated()
                         .requestMatchers(HttpMethod.GET, ApiPaths.USERS_LIST).hasAnyAuthority(RolesName.ADMIN.toString())
-                        .requestMatchers(HttpMethod.PUT, ApiPaths.ADD_ROLE).hasAnyAuthority(RolesName.ADMIN.toString())
+                        .requestMatchers(HttpMethod.PUT, ApiPaths.ADD_ROLE, ApiPaths.BLOCK, ApiPaths.UNBLOCK).hasAnyAuthority(RolesName.ADMIN.toString())
                         .requestMatchers(HttpMethod.POST, ApiPaths.LOGOUT).authenticated()
                         .anyRequest().authenticated()
                 )
