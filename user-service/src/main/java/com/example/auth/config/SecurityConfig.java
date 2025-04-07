@@ -44,6 +44,7 @@ public class SecurityConfig {
                                 "/webjars/**",
                                 ApiPaths.REGISTRATION,
                                 ApiPaths.LOGIN,
+                                ApiPaths.REFRESH,
                                 "/error"
                         ).permitAll()
                         .requestMatchers(HttpMethod.POST, ApiPaths.LOGIN, ApiPaths.REFRESH, ApiPaths.REGISTRATION).permitAll()

@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
+
 
 @Component
 @RequiredArgsConstructor
@@ -56,13 +56,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         try {
-            final String userEmail = jwtService.extractLogin(jwt);
+            final String userEmail = jwtService.extractLogin(jwt, true);
 
 
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-                if (jwtService.isTokenValid(jwt, userDetails)) {
+                if (jwtService.isTokenValid(jwt, userDetails, true)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
@@ -88,6 +88,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 requestURI.startsWith("/swagger-resources") ||
                 requestURI.equals("/error") ||
                 requestURI.equals(ApiPaths.LOGIN) ||
-                requestURI.equals(ApiPaths.REGISTRATION);
+                requestURI.equals(ApiPaths.REGISTRATION)||
+                requestURI.equals(ApiPaths.REFRESH);
     }
 }

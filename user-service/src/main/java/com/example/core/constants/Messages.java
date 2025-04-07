@@ -23,4 +23,8 @@ public class Messages {
     public static final String INCORRECT_LOGIN_OR_PASSWORD = "Неверный логин или пароль";
 
     public static final String INCORRECT_TOKEN = "Перевыполните запрос, случайно сгенерировался токен, который находится в черном списке";
+
+    public static final String NOT_EXPIRED_TOKEN = "Жизненный цикл токена закончился!";
+
+    public static final String INVALID_REFRESH = "Жизненный цикл refresh токена закончился!";
 }

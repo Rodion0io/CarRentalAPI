@@ -64,7 +64,7 @@ public class UserService {
             if (blackListService.inBlackList(accessToken)){
                 throw new CustomException(Messages.INCORRECT_TOKEN, ExceptionType.UNAUTHORIZED);
             }
-            String refreshToken = jwtService.generateRefreshToken(userId.toString(), loginRequestModel.login(), userRoles);
+            String refreshToken = jwtService.generateRefreshToken(userId.toString(), loginRequestModel.login());
             return new LoginDto(accessToken, refreshToken);
         }
         else{
@@ -74,7 +74,7 @@ public class UserService {
 
     @Transactional
     public UserProfileDto getPersonalProfile(String token) {
-        UUID userId = jwtService.extractUserId(token);
+        UUID userId = jwtService.extractUserId(token, true);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         return userMapper.map(user);
@@ -82,7 +82,7 @@ public class UserService {
 
     @Transactional
     public List<UserRolesDto> getUserRoles(String token){
-        UUID userId = jwtService.extractUserId(token);
+        UUID userId = jwtService.extractUserId(token, true);
         List<UserRolesDto> userRoles = new ArrayList<>();
         List<String> userRolesIdList = userRolesRepository.findRoleIdByUserId(userId.toString());
         List<String> userRolesNameList = userRolesRepository.findRoleNamesByUserId(userId.toString());
@@ -113,7 +113,7 @@ public class UserService {
             throw new CustomException(Messages.ALREADY_EXISTS, ExceptionType.ALREADY_EXIST);
         }
         else{
-            UUID userId = jwtService.extractUserId(token);
+            UUID userId = jwtService.extractUserId(token, true);
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new EntityNotFoundException("User not found"));
             User updatedUser = userMapper.map(user, updateModel, passwordEncoder.encode(updateModel.password()));
@@ -163,14 +163,29 @@ public class UserService {
 
     @Transactional
     public LoginDto RefreshToken(String refresh){
-        UUID userId = jwtService.extractUserId(refresh);
-        String login = jwtService.extractLogin(refresh);
-        List<String> userRoles = jwtService.extractRoles(refresh);
-        String accessToken = jwtService.generateAccessToken(userId.toString(), login, userRoles);
-        if (blackListService.inBlackList(accessToken)){
-            throw new CustomException(Messages.INCORRECT_TOKEN, ExceptionType.UNAUTHORIZED);
+        if (!jwtService.isTokenExpired(refresh, false)){
+            if (!blackListService.inBlackList(refresh)){
+                UUID userId = jwtService.extractUserId(refresh, false);
+                String login = jwtService.extractLogin(refresh, false);
+
+                List<String> userRoles = userRolesRepository.findRoleNamesByUserId(userId.toString());
+                String accessToken = jwtService.generateAccessToken(userId.toString(), login, userRoles);
+                if (blackListService.inBlackList(accessToken)){
+                    throw new CustomException(Messages.INCORRECT_TOKEN, ExceptionType.UNAUTHORIZED);
+                }
+                blackListService.addInBlackList(refresh);
+                String refreshToken = jwtService.generateRefreshToken(userId.toString(), login);
+                if (blackListService.inBlackList(refreshToken)){
+                    throw new CustomException(Messages.INCORRECT_TOKEN, ExceptionType.UNAUTHORIZED);
+                }
+                return new LoginDto(accessToken, refreshToken);
+            }
+            else{
+                throw new CustomException(Messages.INVALID_REFRESH, ExceptionType.UNAUTHORIZED);
+            }
         }
-        String refreshToken = jwtService.generateRefreshToken(userId.toString(), login, userRoles);
-        return new LoginDto(accessToken, refreshToken);
+        else{
+            throw new CustomException(Messages.NOT_EXPIRED_TOKEN, ExceptionType.UNAUTHORIZED);
+        }
     }
 }
