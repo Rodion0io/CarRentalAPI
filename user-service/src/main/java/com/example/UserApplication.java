@@ -14,7 +14,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication(scanBasePackages={"com.example"})
 @EnableAutoConfiguration(exclude = SecurityAutoConfiguration.class)
 public class UserApplication {
-    public static void main(String[] args){
+    public static void main(String[] args) {
         SpringApplication.run(UserApplication.class, args);
     }
 }

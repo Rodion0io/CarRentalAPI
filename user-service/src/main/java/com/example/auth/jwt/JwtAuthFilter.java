@@ -3,6 +3,7 @@ package com.example.auth.jwt;
 import com.example.api.constant.ApiPaths;
 import com.example.auth.service.JwtService;
 import com.example.core.service.BlackListService;
+import com.example.core.service.ValidService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -27,4 +27,6 @@ public class Messages {
     public static final String NOT_EXPIRED_TOKEN = "Жизненный цикл токена закончился!";
 
     public static final String INVALID_REFRESH = "Жизненный цикл refresh токена закончился!";
+
+    public static final String DELETED_ACCOUNT = "Аккаунт удален";
 }

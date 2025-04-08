@@ -73,17 +73,21 @@ public class UserService {
         }
     }
 
+    //ок
     @Transactional
     public UserProfileDto getPersonalProfile(String token) {
         UUID userId = jwtService.extractUserId(token, true);
+        validationServ.isBlockedOrDeleteAccount(userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         return userMapper.map(user);
     }
 
+    //ок
     @Transactional
     public List<UserRolesDto> getUserRoles(String token){
         UUID userId = jwtService.extractUserId(token, true);
+        validationServ.isBlockedOrDeleteAccount(userId);
         List<UserRolesDto> userRoles = new ArrayList<>();
         List<String> userRolesIdList = userRolesRepository.findRoleIdByUserId(userId.toString());
         List<String> userRolesNameList = userRolesRepository.findRoleNamesByUserId(userId.toString());
@@ -96,8 +100,11 @@ public class UserService {
         return userRoles;
     }
 
+
     @Transactional
-    public List<UserProfileDto> getUsersList(List<UUID> usersId){
+    public List<UserProfileDto> getUsersList(List<UUID> usersId, String token){
+        UUID currentUserId = jwtService.extractUserId(token, true);
+        validationServ.isBlockedOrDeleteAccount(currentUserId);
         List<UserProfileDto> usersList = new ArrayList<>();
         for (int i = 0; i < usersId.size(); i++){
             User user = userRepository.findById(usersId.get(i))
@@ -108,13 +115,15 @@ public class UserService {
         return usersList;
     }
 
+    // ok
     @Transactional
     public ResponseDto updateProfile(UserUpdateDto updateModel, String token){
+        UUID userId = jwtService.extractUserId(token, true);
+        validationServ.isBlockedOrDeleteAccount(userId);
         if (validationServ.isUniqueEmailAndLogin(updateModel.login(), updateModel.email())){
             throw new CustomException(Messages.ALREADY_EXISTS, ExceptionType.ALREADY_EXIST);
         }
         else{
-            UUID userId = jwtService.extractUserId(token, true);
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new EntityNotFoundException("User not found"));
             User updatedUser = userMapper.map(user, updateModel, passwordEncoder.encode(updateModel.password()));
@@ -123,8 +132,11 @@ public class UserService {
         }
     }
 
+    //ok
     @Transactional
-    public ResponseDto AddRole(RoleDto model, UUID userId){
+    public ResponseDto AddRole(RoleDto model, UUID userId, String token){
+        UUID currentUserId = jwtService.extractUserId(token, true);
+        validationServ.isBlockedOrDeleteAccount(currentUserId);
         // Проверить существование роли, наличие у пользователя выбранной роли
         rolesRepository.findById(model.roleId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -140,8 +152,11 @@ public class UserService {
         }
     }
 
+    //ok
     @Transactional
-    public ResponseDto RemoveRole(UUID userId, UUID roleId){
+    public ResponseDto RemoveRole(UUID userId, UUID roleId, String token){
+        UUID currentUserId = jwtService.extractUserId(token, true);
+        validationServ.isBlockedOrDeleteAccount(currentUserId);
         rolesRepository.findById(roleId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         List<String> userRoles = userRolesRepository.findRoleIdByUserId(userId.toString());
@@ -190,8 +205,12 @@ public class UserService {
         }
     }
 
+
+    //ok
     @Transactional
-    public ResponseDto BlockUser(String userId){
+    public ResponseDto BlockUser(String userId, String token){
+        UUID currentUserId = jwtService.extractUserId(token, true);
+        validationServ.isBlockedOrDeleteAccount(currentUserId);
         User user = userRepository.findById(UUID.fromString(userId))
                 .orElseThrow(() -> new CustomException("User is not found", ExceptionType.NOT_FOUND));
         if (user.getBlockedAt() != null){
@@ -202,8 +221,12 @@ public class UserService {
         return new ResponseDto(200, "Is blocked!");
     }
 
+    //ok
     @Transactional
-    public ResponseDto UnBlockUser(String userId){
+    public ResponseDto UnBlockUser(String userId, String token){
+        // !!!!!!!!
+        UUID currentUserId = jwtService.extractUserId(token, true);
+        validationServ.isBlockedOrDeleteAccount(currentUserId);
         User user = userRepository.findById(UUID.fromString(userId))
                 .orElseThrow(() -> new CustomException("User is not found", ExceptionType.NOT_FOUND));
         if (user.getBlockedAt() == null){
@@ -215,8 +238,10 @@ public class UserService {
     }
 
     @Transactional
-    public ResponseDto DeleteAccount(String id){
-        User user = userRepository.findById(UUID.fromString(id))
+    public ResponseDto DeleteAccount(String token){
+        UUID userId = jwtService.extractUserId(token, true);
+        validationServ.isBlockedOrDeleteAccount(userId);
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException("User is not found", ExceptionType.NOT_FOUND));
         if (user.getDeletedAt() != null){
             throw new CustomException("Account is deleted", ExceptionType.BAD_REQUEST);
@@ -227,8 +252,9 @@ public class UserService {
     }
 
     @Transactional
-    public ResponseDto RecoverAccount(String id){
-        User user = userRepository.findById(UUID.fromString(id))
+    public ResponseDto RecoverAccount(String token){
+        UUID userId = jwtService.extractUserId(token, true);
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException("User is not found", ExceptionType.NOT_FOUND));
         if (user.getDeletedAt() == null){
             throw new CustomException("Account isn't delete", ExceptionType.BAD_REQUEST);

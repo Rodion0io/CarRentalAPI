@@ -39,8 +39,8 @@ public class UserController {
     }
 
     @GetMapping(ApiPaths.USERS_LIST)
-    public List<UserProfileDto> UsersProfiles(@RequestParam List<UUID> usersId){
-        return userService.getUsersList(usersId);
+    public List<UserProfileDto> UsersProfiles(@RequestParam List<UUID> usersId, @RequestHeader("Authorization") String authHeader){
+        return userService.getUsersList(usersId, authHeader.substring(7));
     }
 
     @PutMapping(ApiPaths.UPDATE_PROFILE)
@@ -49,23 +49,23 @@ public class UserController {
     }
 
     @PutMapping(ApiPaths.ADD_ROLE)
-    public ResponseDto AddRole(@PathVariable("id") UUID userId, @RequestBody RoleDto model){
-        return userService.AddRole(model, userId);
+    public ResponseDto AddRole(@PathVariable("id") UUID userId, @RequestBody RoleDto model, @RequestHeader("Authorization") String authHeader){
+        return userService.AddRole(model, userId, authHeader.substring(7));
     }
 
     @DeleteMapping(ApiPaths.REMOVE_ROLE)
-    public ResponseDto RemoveRole(@PathVariable("id") UUID userId, @RequestParam("roleId") UUID roleId){
-        return userService.RemoveRole(userId, roleId);
+    public ResponseDto RemoveRole(@PathVariable("id") UUID userId, @RequestParam("roleId") UUID roleId, @RequestHeader("Authorization") String authHeader){
+        return userService.RemoveRole(userId, roleId, authHeader.substring(7));
     }
 
     @PutMapping(ApiPaths.BLOCK)
-    public ResponseDto BlockUser(@PathVariable("id") UUID userId){
-        return userService.BlockUser(userId.toString());
+    public ResponseDto BlockUser(@PathVariable("id") UUID userId, @RequestHeader("Authorization") String authHeader){
+        return userService.BlockUser(userId.toString(), authHeader.substring(7));
     }
 
     @PutMapping(ApiPaths.UNBLOCK)
-    public ResponseDto UnBlockUser(@PathVariable("id") UUID userId){
-        return userService.UnBlockUser(userId.toString());
+    public ResponseDto UnBlockUser(@PathVariable("id") UUID userId, @RequestHeader("Authorization") String authHeader){
+        return userService.UnBlockUser(userId.toString(), authHeader.substring(7));
     }
 
     @PutMapping(ApiPaths.DELETE_ACCOUNT)
@@ -87,6 +87,4 @@ public class UserController {
     public LoginDto Refresh(@RequestBody RefreshModel model){
         return userService.RefreshToken(model.refreshToken());
     }
-
-
 }
