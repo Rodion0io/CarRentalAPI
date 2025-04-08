@@ -29,4 +29,8 @@ public class Messages {
     public static final String INVALID_REFRESH = "Жизненный цикл refresh токена закончился!";
 
     public static final String DELETED_ACCOUNT = "Аккаунт удален";
+
+    public static final String NOT_FOUND_NAME = "Введите имя и фамилию и отчество(если есть)";
+
+    public static final String NOT_FOUND_ROLE = "Такая роль не сушествует";
 }

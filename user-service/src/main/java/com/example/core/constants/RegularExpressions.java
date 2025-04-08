@@ -11,4 +11,6 @@ public class RegularExpressions {
     public static final String PHONE_PATTERN = "^(\\+(7))||8\\d{10}$";
 
     public static final String LOGIN_PATTERN = "[A-Za-z\\d]{4,}";
+
+    public static final String PERSONAL_DATAS_PATTERN = "[А-ЯЁа-яё]";
 }

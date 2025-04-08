@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -41,8 +42,12 @@ public class UserService {
 
     @Transactional
     public RegistrationDto register(RegistrationRequestDto registrationModel){
+        validationServ.checkValidDatas(registrationModel.login(),
+                registrationModel.password(), registrationModel.name(),
+                registrationModel.surname(), registrationModel.middlename(),
+                registrationModel.phone(), registrationModel.email());
         if (validationServ.isUniqueEmailAndLogin(registrationModel.login(), registrationModel.email())){
-            throw new CustomException("Login is already exists", ExceptionType.ALREADY_EXIST);
+            throw new CustomException(Messages.ALREADY_EXISTS, ExceptionType.ALREADY_EXIST);
         }
         else{
             User user = userMapper.map(registrationModel, passwordEncoder.encode(registrationModel.password()));
@@ -57,6 +62,9 @@ public class UserService {
 
     @Transactional
     public LoginDto logIn(LoginRequestDto loginRequestModel){
+        validationServ.checkValidDatas(loginRequestModel.login(),
+                loginRequestModel.password(), null, null,
+                null, null, null);
         if (validationServ.isLogin(loginRequestModel.login())
                 && validationServ.correctPasswordCheck(loginRequestModel.login(), loginRequestModel.password())){
             UUID userId = userRepository.findIdByLogin(loginRequestModel.login()).getId();
@@ -107,10 +115,12 @@ public class UserService {
         validationServ.isBlockedOrDeleteAccount(currentUserId);
         List<UserProfileDto> usersList = new ArrayList<>();
         for (int i = 0; i < usersId.size(); i++){
-            User user = userRepository.findById(usersId.get(i))
-                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
-            UserProfileDto userDto = userMapper.map(user);
-            usersList.add(userDto);
+            Optional<User> optionalUser = userRepository.findById(usersId.get(i));
+            if (optionalUser.isPresent()){
+                User user = optionalUser.get();
+                UserProfileDto userDto = userMapper.map(user);
+                usersList.add(userDto);
+            }
         }
         return usersList;
     }
@@ -120,6 +130,9 @@ public class UserService {
     public ResponseDto updateProfile(UserUpdateDto updateModel, String token){
         UUID userId = jwtService.extractUserId(token, true);
         validationServ.isBlockedOrDeleteAccount(userId);
+        validationServ.checkValidDatas(updateModel.login(),
+                updateModel.password(), updateModel.name(), updateModel.surname(),
+                updateModel.middlename(), updateModel.phone(), updateModel.email());
         if (validationServ.isUniqueEmailAndLogin(updateModel.login(), updateModel.email())){
             throw new CustomException(Messages.ALREADY_EXISTS, ExceptionType.ALREADY_EXIST);
         }
@@ -142,10 +155,15 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         List<String> userRoles = userRolesRepository.findRoleIdByUserId(userId.toString());
         if (!userRoles.contains(model.roleId())){
-            UserRolesDto firstRoles = new UserRolesDto(userId.toString(), model.roleId().toString());
-            UserRoles roles = userRolesMapper.map(firstRoles);
-            userRolesRepository.save(roles);
-            return new ResponseDto(200, "Added new role");
+            if (rolesRepository.findById(model.roleId()).isPresent()){
+                UserRolesDto firstRoles = new UserRolesDto(userId.toString(), model.roleId().toString());
+                UserRoles roles = userRolesMapper.map(firstRoles);
+                userRolesRepository.save(roles);
+                return new ResponseDto(200, "Added new role");
+            }
+            else{
+                throw new CustomException(Messages.NOT_FOUND_ROLE, ExceptionType.BAD_REQUEST);
+            }
         }
         else{
             return new ResponseDto(401, "The user already has this role.");

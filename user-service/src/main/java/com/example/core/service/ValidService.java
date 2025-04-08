@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+import com.example.core.constants.RegularExpressions;
+
+
 @Service
 @RequiredArgsConstructor
 public class ValidService {
@@ -19,7 +22,7 @@ public class ValidService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     boolean isUniqueEmailAndLogin(String login, String email){
-        if (userRepository.existsByLoginAndEmail(login, email)){
+        if (userRepository.existsByLogin(login) || userRepository.existsByEmail(email)){
             return true;
         }
         return false;
@@ -38,6 +41,33 @@ public class ValidService {
             return true;
         }
         return false;
+    }
+
+//    <T extends RegistrationRequestDto | LoginRequestDto> void checkValidPersonalDatas(T model){
+//
+//    }
+
+    void checkValidDatas(String login, String password, String name,
+                         String surname, String middlename, String phone,
+                         String email){
+        if (login == null || !login.matches(RegularExpressions.LOGIN_PATTERN)){
+            throw new CustomException(Messages.LOGIN_INVALID, ExceptionType.BAD_REQUEST);
+        }
+        if (password == null || !password.matches(RegularExpressions.PASSWORD_PATTERN)){
+            throw new CustomException(Messages.PASSWORD_INVALID, ExceptionType.BAD_REQUEST);
+        }
+        if (name == null || surname == null
+                || !name.matches(RegularExpressions.PERSONAL_DATAS_PATTERN)
+                || !surname.matches(RegularExpressions.PERSONAL_DATAS_PATTERN)
+                || !middlename.matches(RegularExpressions.PERSONAL_DATAS_PATTERN)){
+            throw new CustomException(Messages.NOT_FOUND_NAME, ExceptionType.BAD_REQUEST);
+        }
+        if (phone == null || !phone.matches(RegularExpressions.PHONE_PATTERN)){
+            throw new CustomException(Messages.PHONE_INVALID, ExceptionType.BAD_REQUEST);
+        }
+        if (email == null || !email.matches(RegularExpressions.EMAIL_PATTERN)){
+            throw new CustomException(Messages.EMAIL_INVALID, ExceptionType.BAD_REQUEST);
+        }
     }
 
     void isBlockedOrDeleteAccount(UUID userId){
