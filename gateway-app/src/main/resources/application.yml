@@ -4,3 +4,18 @@ server:
 spring:
   application:
     name: gatewayApplication
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: http://localhost:9000
+          predicates:
+            - Path=/api/user/**
+            - Path=/api/admin/**
+#            "/zoo/**"
+#        - id: random_animal_route
+#            uri: lb://random-animal
+#            predicates:
+#              - Path=/random-animal/**
+#            filters:
+#              - StripPrefix=1
