@@ -56,10 +56,7 @@ public class ValidService {
         if (password == null || !password.matches(RegularExpressions.PASSWORD_PATTERN)){
             throw new CustomException(Messages.PASSWORD_INVALID, ExceptionType.BAD_REQUEST);
         }
-        if (name == null || surname == null
-                || !name.matches(RegularExpressions.PERSONAL_DATAS_PATTERN)
-                || !surname.matches(RegularExpressions.PERSONAL_DATAS_PATTERN)
-                || !middlename.matches(RegularExpressions.PERSONAL_DATAS_PATTERN)){
+        if (name == null || surname == null){
             throw new CustomException(Messages.NOT_FOUND_NAME, ExceptionType.BAD_REQUEST);
         }
         if (phone == null || !phone.matches(RegularExpressions.PHONE_PATTERN)){
