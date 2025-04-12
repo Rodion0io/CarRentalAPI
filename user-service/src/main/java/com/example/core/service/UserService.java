@@ -1,7 +1,9 @@
 package com.example.core.service;
 
+import com.common.blacklist.core.service.BlackListService;
 import com.example.api.dto.*;
-import com.example.auth.service.JwtService;
+//import com.example.auth.service.JwtService;
+import com.common.auth.service.JwtService;
 import com.example.core.entity.User;
 import com.example.core.entity.UserRoles;
 import com.example.core.mapper.UserMapper;

@@ -19,9 +19,8 @@
 
 	<modules>
 		<module>user-service</module>
-		<module>common</module>
 		<module>gateway-app</module>
-		<!-- Удален дублирующийся gateway-app -->
+		<module>common</module>
 	</modules>
 
 	<properties>

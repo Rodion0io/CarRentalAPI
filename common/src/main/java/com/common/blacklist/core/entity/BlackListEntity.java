@@ -1,4 +1,4 @@
-package com.example.core.entity;
+package com.common.blacklist.core.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -6,7 +6,6 @@ import org.hibernate.annotations.UuidGenerator;
 
 import java.util.UUID;
 
-// это вынесем в папку с общими настрйоками
 @Entity
 @Builder
 @Getter
@@ -14,8 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Table(name = "black_list")
-public class BlackListTokens {
-
+public class BlackListEntity {
     @Id
     @GeneratedValue
     @UuidGenerator
@@ -23,5 +21,4 @@ public class BlackListTokens {
 
     @Column(name="token", length = 400, nullable = false)
     private String token;
-
 }

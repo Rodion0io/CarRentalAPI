@@ -18,6 +18,7 @@ import com.example.core.constants.RegularExpressions;
 @Service
 @RequiredArgsConstructor
 public class ValidService {
+
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 

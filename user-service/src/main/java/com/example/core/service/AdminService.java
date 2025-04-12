@@ -4,7 +4,7 @@ import com.example.api.dto.ResponseDto;
 import com.example.api.dto.RoleDto;
 import com.example.api.dto.UserProfileDto;
 import com.example.api.dto.UserRolesDto;
-import com.example.auth.service.JwtService;
+import com.common.auth.service.JwtService;
 import com.example.core.constants.Messages;
 import com.example.core.entity.User;
 import com.example.core.entity.UserRoles;
